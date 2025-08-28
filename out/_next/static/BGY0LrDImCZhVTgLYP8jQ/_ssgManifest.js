@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F","\u002Fdoc","\u002Fdoc\u002Fchangelog","\u002Fdoc\u002Fcommands","\u002Fdoc\u002Fconfig","\u002Fdoc\u002Fgui","\u002Fdoc\u002Fpermissions","\u002Fguyueisland","\u002Fguyueisland\u002Fdownload"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

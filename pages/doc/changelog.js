@@ -1,5 +1,4 @@
 import fs from 'fs'
-import path from 'path'
 import { Container, Heading, Box } from '@chakra-ui/react'
 import Layout from '../../components/layouts/article'
 import Markdown from '../../components/markdown'

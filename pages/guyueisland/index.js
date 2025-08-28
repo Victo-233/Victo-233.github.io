@@ -5,19 +5,17 @@ import Head from 'next/head'
 import Layout from '../../components/layouts/article'
 
 export async function getStaticProps() {
-  const root = 'F:/mc空岛插件开发/GuYueIsland'
+  const filesDir = path.join(process.cwd(), 'public', 'files')
   let version = ''
   let jarName = ''
   try {
-    const pom = fs.readFileSync(path.join(root, 'pom.xml'), 'utf8')
-    const m = pom.match(/<version>([^<]+)<\/version>/)
-    version = m ? m[1] : ''
-  } catch {}
-  try {
-    const targetDir = path.join(root, 'target')
-    const files = fs.existsSync(targetDir) ? fs.readdirSync(targetDir) : []
-    const jar = files.find(f => /^guyueisland-.*\.jar$/.test(f))
+    const entries = fs.existsSync(filesDir) ? fs.readdirSync(filesDir) : []
+    const jar = entries.find(f => /^guyueisland-.*\.jar$/.test(f))
     jarName = jar || ''
+    if (jar) {
+      const m = jar.match(/^guyueisland-(.+)\.jar$/)
+      version = m ? m[1] : ''
+    }
   } catch {}
 
   return { props: { version, jarName } }
@@ -40,7 +38,7 @@ const GuyueIntro = ({ version, jarName }) => {
                 applicationCategory: 'Game',
                 description: 'Minecraft 空岛插件，现代、可配置，提供下载与文档。',
                 offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
-                url: (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000') + '/guyueisland'
+                url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://victo-233.github.io') + '/guyueisland'
               })
             }}
           />
@@ -52,7 +50,7 @@ const GuyueIntro = ({ version, jarName }) => {
                 '@type': 'VideoObject',
                 name: 'GuYueIsland 演示视频',
                 description: 'GuYueIsland 插件演示。',
-                thumbnailUrl: [(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000') + '/card.png'],
+                thumbnailUrl: [(process.env.NEXT_PUBLIC_SITE_URL || 'https://victo-233.github.io') + '/card.png'],
                 uploadDate: new Date().toISOString(),
                 contentUrl: `https://www.bilibili.com/video/${bvid}`,
                 embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}`
@@ -66,7 +64,7 @@ const GuyueIntro = ({ version, jarName }) => {
         <Text mb={6} opacity={0.8}>Minecraft 空岛插件</Text>
         <Stack direction={{ base: 'column', sm: 'row' }} spacing={3} justify="center" align="center">
           {jarName ? (
-            <Button as={Link} href={`/api/guyueisland/download?file=${encodeURIComponent(jarName)}`} colorScheme="teal">
+            <Button as={Link} href={`/files/${encodeURIComponent(jarName)}`} colorScheme="teal">
               下载最新 ({jarName})
             </Button>
           ) : (

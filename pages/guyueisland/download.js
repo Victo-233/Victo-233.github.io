@@ -1,7 +1,6 @@
 import { Container, Heading, Text, Link, List, ListItem } from '@chakra-ui/react'
 import Layout from '../../components/layouts/article'
 import fs from 'fs'
-import path from 'path'
 
 export async function getStaticProps() {
   const root = 'F:/mc空岛插件开发/GuYueIsland/target'

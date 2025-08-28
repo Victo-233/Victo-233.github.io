@@ -21,7 +21,7 @@ import { HamburgerIcon } from '@chakra-ui/icons'
 import ThemeToggleButton from './theme-toggle-button'
 // removed GitHub icon import
 
-const LinkItem = ({ href, path, target, children, ...props }) => {
+function LinkItem({ href, path, target, children, ...props }) {
   const active = path === href
   const inactiveColor = useColorModeValue('gray.800', 'whiteAlpha.900')
   return (
@@ -47,13 +47,15 @@ const MenuLink = forwardRef((props, ref) => (
 const Navbar = props => {
   const { path } = props
   const docsActive = path && path.startsWith('/doc')
+  const navBg = useColorModeValue('#ffffff40', '#20202380')
+  const menuInactiveColor = useColorModeValue('gray.800', 'whiteAlpha.900')
 
   return (
     <Box
       position="fixed"
       as="nav"
       w="100%"
-      bg={useColorModeValue('#ffffff40', '#20202380')}
+      bg={navBg}
       css={{ backdropFilter: 'blur(10px)' }}
       zIndex={2}
       {...props}
@@ -91,7 +93,7 @@ const Navbar = props => {
               size="sm"
               px={2}
               bg={docsActive ? 'grassTeal' : undefined}
-              color={docsActive ? '#202023' : useColorModeValue('gray.800', 'whiteAlpha.900')}
+              color={docsActive ? '#202023' : menuInactiveColor}
             >
               文档
             </MenuButton>

@@ -42,6 +42,7 @@ export default function Markdown({ content, showToc = true }) {
   const headings = showToc ? extractHeadings(content) : []
   const borderColor = useColorModeValue('blackAlpha.200', 'whiteAlpha.200')
   const codeBg = useColorModeValue('blackAlpha.50', 'whiteAlpha.100')
+  const linkColor = useColorModeValue('teal.600', 'teal.300')
 
   return (
     <Box>
@@ -57,7 +58,7 @@ export default function Markdown({ content, showToc = true }) {
           <Text mb={2} fontWeight="semibold" opacity={0.9}>目录</Text>
           {headings.map(h => (
             <Box key={h.id} pl={h.depth === 3 ? 4 : 0} mb={1}>
-              <ChakraLink href={`#${h.id}`} color={useColorModeValue('teal.600', 'teal.300')}>
+              <ChakraLink href={`#${h.id}`} color={linkColor}>
                 {h.text}
               </ChakraLink>
             </Box>
@@ -69,7 +70,7 @@ export default function Markdown({ content, showToc = true }) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h2({ node, children, ...props }) {
+            h2({ children, ...props }) {
               const text = String(children?.[0] || '')
               const id = slugify(text)
               return (
@@ -78,7 +79,7 @@ export default function Markdown({ content, showToc = true }) {
                 </Heading>
               )
             },
-            h3({ node, children, ...props }) {
+            h3({ children, ...props }) {
               const text = String(children?.[0] || '')
               const id = slugify(text)
               return (
@@ -87,9 +88,9 @@ export default function Markdown({ content, showToc = true }) {
                 </Heading>
               )
             },
-            a({ node, children, href, ...props }) {
+            a({ children, href, ...props }) {
               return (
-                <ChakraLink href={href} color={useColorModeValue('teal.600', 'teal.300')} {...props}>
+                <ChakraLink href={href} color={linkColor} {...props}>
                   {children}
                 </ChakraLink>
               )

@@ -13,7 +13,7 @@ const MouseEffects = dynamic(() => import('../mouse-effects'), { ssr: false })
 const BgmPlayer = dynamic(() => import('../bgm-player'), { ssr: false })
 
 const Main = ({ children, router }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://victo-233.github.io'
   const canonicalUrl = `${baseUrl}${router.asPath === '/' ? '' : router.asPath}`
   return (
     <Box as="main" pb={8} minH="100vh" display="flex" flexDirection="column">
