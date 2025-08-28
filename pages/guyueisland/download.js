@@ -3,7 +3,7 @@ import Layout from '../../components/layouts/article'
 import fs from 'fs'
 
 export async function getStaticProps() {
-  const root = 'F:/mc空岛插件开发/GuYueIsland/target'
+  const root = '.'
   let jars = []
   try {
     if (fs.existsSync(root)) {
