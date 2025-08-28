@@ -1,0 +1,33 @@
+import fs from 'fs'
+import { Container, Heading, Box } from '@chakra-ui/react'
+import Layout from '../../components/layouts/article'
+import Markdown from '../../components/markdown'
+
+export async function getStaticProps() {
+  const readmePath = 'F:/mc空岛插件开发/GuYueIsland/README.md'
+  let section = ''
+  try {
+    const md = fs.readFileSync(readmePath, 'utf8')
+    const start = md.indexOf('## 配置详解')
+    const end = md.indexOf('## 岛屿类型与示意图')
+    if (start >= 0) {
+      section = md.slice(start, end > start ? end : undefined)
+    }
+  } catch {}
+  return { props: { section } }
+}
+
+export default function Page({ section }) {
+  return (
+    <Layout title="配置文件说明">
+      <Container>
+        <Heading as="h2" variant="page-title" mb={4}>配置文件说明</Heading>
+        <Box>
+          <Markdown content={section || '暂无'} showToc={true} />
+        </Box>
+      </Container>
+    </Layout>
+  )
+}
+
+
