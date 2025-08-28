@@ -3,7 +3,7 @@ import Layout from '../../components/layouts/article'
 import fs from 'fs'
 
 export async function getStaticProps() {
-  const root = '.'
+  const root = 'public/files'
   let jars = []
   try {
     if (fs.existsSync(root)) {
@@ -21,12 +21,12 @@ const DownloadPage = ({ jars }) => (
         <List spacing={2}>
           {jars.map(name => (
             <ListItem key={name}>
-              <Link href={`/api/guyueisland/download?file=${encodeURIComponent(name)}`}>{name}</Link>
+              <Link href={`/files/${encodeURIComponent(name)}`}>{name}</Link>
             </ListItem>
           ))}
         </List>
       ) : (
-        <Text>未找到可下载的 JAR 文件，请先构建项目。</Text>
+        <Text>未找到可下载的 JAR 文件。请将 .jar 文件放到 public/files/ 目录。</Text>
       )}
     </Container>
   </Layout>

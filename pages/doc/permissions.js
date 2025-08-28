@@ -1,10 +1,11 @@
 import fs from 'fs'
+import path from 'path'
 import { Container, Heading, Box } from '@chakra-ui/react'
 import Layout from '../../components/layouts/article'
 import Markdown from '../../components/markdown'
 
 export async function getStaticProps() {
-  const readmePath = 'F:/mc空岛插件开发/GuYueIsland/README.md'
+  const readmePath = path.join(process.cwd(), 'public', 'README.md')
   let section = ''
   try {
     const md = fs.readFileSync(readmePath, 'utf8')
