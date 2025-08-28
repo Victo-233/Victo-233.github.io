@@ -1,9 +1,10 @@
 import { Container, Heading, Text, Link, List, ListItem } from '@chakra-ui/react'
 import Layout from '../../components/layouts/article'
 import fs from 'fs'
+import path from 'path'
 
 export async function getStaticProps() {
-  const root = 'public/files'
+  const root = path.join(process.cwd(), 'public', 'files')
   let jars = []
   try {
     if (fs.existsSync(root)) {
