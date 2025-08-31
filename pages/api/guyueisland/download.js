@@ -8,7 +8,7 @@ export default function handler(req, res) {
     res.status(400).json({ error: 'file 参数缺失' })
     return
   }
-  const base = 'F:/mc空岛插件开发/GuYueIsland/target'
+  const base = path.join(process.cwd(), 'public', 'files')
   const safe = path.basename(file)
   const full = path.join(base, safe)
   if (!fs.existsSync(full) || !fs.statSync(full).isFile()) {

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Container, Heading, Text, Link, Button, Badge, Stack, AspectRatio } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Layout from '../../components/layouts/article'
 
@@ -24,12 +24,30 @@ export async function getStaticProps() {
 
 const GuyueIntro = ({ version, jarName }) => {
   const bvid = process.env.NEXT_PUBLIC_BILIBILI_BVID || 'BV1wRh1zwEZm'
+  const [metrics, setMetrics] = useState(null)
   useEffect(() => {
-    fetch('/api/metrics/increment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'view' })
-    }).catch(() => {})
+    try {
+      const key = 'metrics:view:' + (typeof window !== 'undefined' ? window.location.pathname : 'unknown')
+      const last = typeof window !== 'undefined' ? window.sessionStorage.getItem(key) : null
+      const now = Date.now()
+      if (!last || now - Number(last) > 3000) {
+        fetch('/api/metrics/increment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'view' })
+        }).catch(() => {})
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(key, String(now))
+        }
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/metrics')
+      .then(r => r.json())
+      .then(d => setMetrics(d.metrics))
+      .catch(() => {})
   }, [])
 
   return (
@@ -70,7 +88,14 @@ const GuyueIntro = ({ version, jarName }) => {
         <Heading as="h2" variant="page-title" mb={2}>
           GuYueIsland <Badge ml={2} colorScheme="green">{version || '未知'}</Badge>
         </Heading>
-        <Text mb={6} opacity={0.8}>Minecraft 空岛插件</Text>
+        <Text mb={2} opacity={0.8}>Minecraft 空岛插件</Text>
+        {metrics ? (
+          <Text mb={6} fontSize="sm" opacity={0.7}>
+            总浏览：{metrics.views} 次 · 总下载：{metrics.downloads} 次
+          </Text>
+        ) : (
+          <Text mb={6} fontSize="sm" opacity={0.5}>正在加载统计...</Text>
+        )}
         <Stack direction={{ base: 'column', sm: 'row' }} spacing={3} justify="center" align="center">
           {jarName ? (
             <Button as={Link} href={`/api/guyueisland/download?file=${encodeURIComponent(jarName)}`} colorScheme="teal">
