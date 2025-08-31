@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { Container, Heading, Text, Link, Button, Badge, Stack, AspectRatio } from '@chakra-ui/react'
+import { useEffect } from 'react'
 import Head from 'next/head'
 import Layout from '../../components/layouts/article'
 
@@ -23,6 +24,14 @@ export async function getStaticProps() {
 
 const GuyueIntro = ({ version, jarName }) => {
   const bvid = process.env.NEXT_PUBLIC_BILIBILI_BVID || 'BV1wRh1zwEZm'
+  useEffect(() => {
+    fetch('/api/metrics/increment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'view' })
+    }).catch(() => {})
+  }, [])
+
   return (
     <Layout title="GuYueIsland">
       <Container textAlign="center">
@@ -64,7 +73,7 @@ const GuyueIntro = ({ version, jarName }) => {
         <Text mb={6} opacity={0.8}>Minecraft 空岛插件</Text>
         <Stack direction={{ base: 'column', sm: 'row' }} spacing={3} justify="center" align="center">
           {jarName ? (
-            <Button as={Link} href={`/files/${encodeURIComponent(jarName)}`} colorScheme="teal">
+            <Button as={Link} href={`/api/guyueisland/download?file=${encodeURIComponent(jarName)}`} colorScheme="teal">
               下载最新 ({jarName})
             </Button>
           ) : (

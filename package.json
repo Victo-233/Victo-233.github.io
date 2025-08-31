@@ -1,6 +1,6 @@
 {
   "name": "craftzdog-homepage",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "GuYueIsland - Minecraft 空岛插件",
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
