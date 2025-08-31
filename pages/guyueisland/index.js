@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Container, Heading, Text, Link, Button, Badge, Stack, AspectRatio } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { increment as countInc, get as countGet } from '../../lib/countapi'
 import Head from 'next/head'
 import Layout from '../../components/layouts/article'
 
@@ -31,11 +32,7 @@ const GuyueIntro = ({ version, jarName }) => {
       const last = typeof window !== 'undefined' ? window.sessionStorage.getItem(key) : null
       const now = Date.now()
       if (!last || now - Number(last) > 3000) {
-        fetch('/api/metrics/increment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'view' })
-        }).catch(() => {})
+        countInc('guyueisland:views').catch(() => {})
         if (typeof window !== 'undefined') {
           window.sessionStorage.setItem(key, String(now))
         }
@@ -44,9 +41,11 @@ const GuyueIntro = ({ version, jarName }) => {
   }, [])
 
   useEffect(() => {
-    fetch('/api/metrics')
-      .then(r => r.json())
-      .then(d => setMetrics(d.metrics))
+    Promise.all([
+      countGet('guyueisland:views'),
+      countGet('guyueisland:downloads')
+    ])
+      .then(([v, d]) => setMetrics({ views: v?.value ?? 0, downloads: d?.value ?? 0 }))
       .catch(() => {})
   }, [])
 
@@ -98,7 +97,19 @@ const GuyueIntro = ({ version, jarName }) => {
         )}
         <Stack direction={{ base: 'column', sm: 'row' }} spacing={3} justify="center" align="center">
           {jarName ? (
-            <Button as={Link} href={`/api/guyueisland/download?file=${encodeURIComponent(jarName)}`} colorScheme="teal">
+            <Button as={Link} href={`/files/${encodeURIComponent(jarName)}`} colorScheme="teal"
+              onClick={async (e) => {
+                try {
+                  e.preventDefault()
+                  const href = `/files/${encodeURIComponent(jarName)}`
+                  await countInc('guyueisland:downloads').catch(() => {})
+                  await countInc(`guyueisland:download:${jarName}`).catch(() => {})
+                  window.location.href = href
+                } catch {
+                  window.location.href = `/files/${encodeURIComponent(jarName)}`
+                }
+              }}
+            >
               下载最新 ({jarName})
             </Button>
           ) : (

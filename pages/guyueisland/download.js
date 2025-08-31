@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Layout from '../../components/layouts/article'
 import fs from 'fs'
 import path from 'path'
+import { increment as countInc, get as countGet } from '../../lib/countapi'
 
 export async function getStaticProps() {
   const root = path.join(process.cwd(), 'public', 'files')
@@ -28,17 +29,14 @@ export async function getStaticProps() {
 
 const DownloadPage = ({ jars }) => {
   const [metrics, setMetrics] = useState(null)
+  const [perFile, setPerFile] = useState({})
   useEffect(() => {
     try {
       const key = 'metrics:view:' + (typeof window !== 'undefined' ? window.location.pathname : 'unknown')
       const last = typeof window !== 'undefined' ? window.sessionStorage.getItem(key) : null
       const now = Date.now()
       if (!last || now - Number(last) > 3000) {
-        fetch('/api/metrics/increment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'view' })
-        }).catch(() => {})
+        countInc('guyueisland:views').catch(() => {})
         if (typeof window !== 'undefined') {
           window.sessionStorage.setItem(key, String(now))
         }
@@ -47,11 +45,25 @@ const DownloadPage = ({ jars }) => {
   }, [])
 
   useEffect(() => {
-    fetch('/api/metrics')
-      .then(r => r.json())
-      .then(d => setMetrics(d.metrics))
+    Promise.all([
+      countGet('guyueisland:views'),
+      countGet('guyueisland:downloads')
+    ])
+      .then(([v, d]) => setMetrics({ views: v?.value ?? 0, downloads: d?.value ?? 0 }))
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    const names = (jars || []).map(j => j.name)
+    if (!names.length) return
+    Promise.all(
+      names.map(n => countGet(`guyueisland:download:${n}`).then(r => [n, r?.value ?? 0]).catch(() => [n, 0]))
+    ).then(entries => {
+      const obj = {}
+      entries.forEach(([n, v]) => { obj[n] = v })
+      setPerFile(obj)
+    }).catch(() => {})
+  }, [jars])
 
   return (
     <Layout title="下载">
@@ -66,10 +78,20 @@ const DownloadPage = ({ jars }) => {
         {jars && jars.length ? (
           <List spacing={2}>
             {jars.map(j => {
-              const count = metrics && metrics.perFileDownloads ? (metrics.perFileDownloads[j.name] || 0) : 0
+              const count = perFile[j.name] || 0
+              const href = `/files/${encodeURIComponent(j.name)}`
               return (
                 <ListItem key={j.name}>
-                  <Link href={`/api/guyueisland/download?file=${encodeURIComponent(j.name)}`}>{j.name}</Link>
+                  <Link href={href} onClick={async (e) => {
+                    try {
+                      e.preventDefault()
+                      await countInc('guyueisland:downloads').catch(() => {})
+                      await countInc(`guyueisland:download:${j.name}`).catch(() => {})
+                      window.location.href = href
+                    } catch {
+                      window.location.href = href
+                    }
+                  }}>{j.name}</Link>
                   {j.createdAt ? ` （更新时间：${new Date(j.createdAt).toLocaleString('zh-CN', { hour12: false })}）` : ''}
                   {`  · 下载：${count} 次`}
                 </ListItem>
